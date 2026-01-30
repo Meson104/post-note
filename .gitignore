@@ -1,35 +1,33 @@
-#....................backend......................
-
-# prod
-backend/dist/
-
-# dev
-backend/.yarn/
-backend/!.yarn/releases
-backend/.vscode/*
-backend/!.vscode/launch.json
-backend/!.vscode/*.code-snippets
-backend/.idea/workspace.xml
-backend/.idea/usage.statistics.xml
-backend/.idea/shelf
+# build
+dist/
 
 # deps
-backend/node_modules/
-backend/.wrangler
+node_modules/
+.wrangler/
 
 # env
-backend/.env
-backend/.env.production
-backend/.dev.vars
+.env
+.env.*
+.dev.vars
 
 # logs
-backend/logs/
-backend/*.log
-backend/npm-debug.log*
-backend/yarn-debug.log*
-backend/yarn-error.log*
-backend/pnpm-debug.log*
-backend/lerna-debug.log*
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
 
-# misc
-backend/.DS_Store
+# editors
+.vscode/*
+!.vscode/
+!.vscode/launch.json
+!.vscode/*.code-snippets
+.idea/
+
+# OS
+.DS_Store
+
+# yarn (if using berry)
+.yarn/*
+!.yarn/releases/
