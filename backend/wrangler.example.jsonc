@@ -1,0 +1,9 @@
+{
+  "name": "backend",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-01-28",
+  "vars": {
+    "DATABASE_URL": "prisma://...",
+    "JWT_SECRET": "change-me"
+  }
+}
