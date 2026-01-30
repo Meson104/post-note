@@ -1,5 +1,35 @@
-node_modules
-# Keep environment variables out of version control
-backend/.env
+#....................backend......................
 
-backend/wrangler.*
+# prod
+backend/dist/
+
+# dev
+backend/.yarn/
+backend/!.yarn/releases
+backend/.vscode/*
+backend/!.vscode/launch.json
+backend/!.vscode/*.code-snippets
+backend/.idea/workspace.xml
+backend/.idea/usage.statistics.xml
+backend/.idea/shelf
+
+# deps
+backend/node_modules/
+backend/.wrangler
+
+# env
+backend/.env
+backend/.env.production
+backend/.dev.vars
+
+# logs
+backend/logs/
+backend/*.log
+backend/npm-debug.log*
+backend/yarn-debug.log*
+backend/yarn-error.log*
+backend/pnpm-debug.log*
+backend/lerna-debug.log*
+
+# misc
+backend/.DS_Store
