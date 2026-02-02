@@ -10,44 +10,59 @@ export const blogRouter = new Hono<{
         JWT_SECRET : string;
     },
     Variables : {
-        userId : string
+        userId : string;
     }
 }>();
 
 blogRouter.use('/*', async (c,next)=>{
     const authHeader = c.req.header("Authorization" ) || "";
-    const user = await verify(authHeader, c.env.JWT_SECRET,'HS256') as {id : string};
+    try{
+        const user = await verify(authHeader, c.env.JWT_SECRET,'HS256') as {id : string}
     if(user) {
         c.set("userId",user.id);
-        next();
+        await next();
     }else {
         c.status(403);
         return c.json({
             message : "you are not logged in!"
         });
     }
+    }catch(e){
+        c.status(403);
+        return c.text(`You are not logged in`);
+    }
+    
 })
+
 
 blogRouter.post('/', async (c) => {
-    const userId = c.get("userId");
-    const body = await c.req.json();
-    const prisma = new PrismaClient({datasourceUrl : c.env.DATABASE_URL }).$extends(withAccelerate());
+  const userId = c.get("userId");
+  const authorId = Number(userId);
 
-    try{
-       const blog =  await prisma.blog.create({
-            data: {
-                title : body.title,
-                content : body.content,
-                authorId : Number(userId)
-            }
-        })
-        return c.json({id : blog.id})
-    }catch(e){
-        c.status(500);
-        return c.text("Something's not quite right")
+  if (!Number.isInteger(authorId)) {
+    c.status(400);
+    return c.json({
+      message: "Invalid userId from auth middleware",
+      userId
+    });
+  }
+
+  const body = await c.req.json();
+  const prisma = new PrismaClient({
+    datasourceUrl: c.env.DATABASE_URL
+  }).$extends(withAccelerate());
+
+  const blog = await prisma.blog.create({
+    data: {
+      title: body.title,
+      content: body.content,
+      authorId
     }
-  
-})
+  });
+
+  return c.json({ id: blog.id });
+});
+
 
 blogRouter.put('/', async (c) => {
     const body  = await c.req.json();
@@ -72,14 +87,26 @@ blogRouter.put('/', async (c) => {
   
 })
 
-blogRouter.get('/', async(c) => {
-    const body = await c.req.json();
+//todo pagination at some point
+blogRouter.get('/bulk', async(c) => {
+  const prisma  = new PrismaClient({datasourceUrl : c.env.DATABASE_URL}).$extends(withAccelerate());
+  try{
+    const blogs = await prisma.blog.findMany();
+    return c.json({blogs});
+  }catch(e){
+    c.status(500);
+    return c.text("Somehing is terribly wrong");
+  }
+})
+
+blogRouter.get('/:id', async(c) => {
+    const id =  c.req.param("id");
     const prisma = new PrismaClient({datasourceUrl: c.env.DATABASE_URL}).$extends(withAccelerate());
 
     try{
         const blog = await prisma.blog.findFirst({
             where: {
-                id : body.id
+                id : Number(id)
             }
         })
         if(!blog){
@@ -95,14 +122,3 @@ blogRouter.get('/', async(c) => {
 })
 
 
-//todo pagination at some point
-blogRouter.get('/bulk', async(c) => {
-  const prisma  = new PrismaClient({datasourceUrl : c.env.DATABASE_URL}).$extends(withAccelerate());
-  try{
-    const blogs = await prisma.blog.findMany();
-    return c.json({blogs});
-  }catch(e){
-    c.status(500);
-    return c.text("Somehing is terribly wrong");
-  }
-})

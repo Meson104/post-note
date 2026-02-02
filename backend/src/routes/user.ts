@@ -58,7 +58,7 @@ userRouter.post('/signin', async (c) => {
       c.status(403);
       return c.json({"message":"Invalid creds"});
     }
-    const jwt = await sign({id : body.id}, c.env.JWT_SECRET);
+    const jwt = await sign({id : user.id}, c.env.JWT_SECRET);
     return c.text(jwt);
 
   }catch(e){
